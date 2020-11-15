@@ -3,6 +3,7 @@ library(vroom)
 library(tidyverse)
 library(shinyalert)
 library(shinycssloaders)
+library(shinyBS) # drop-down panels
 library(shiny)
 
 source("scripts/upload_formatting.R")

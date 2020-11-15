@@ -10,21 +10,41 @@ uploadsTabUI <- function(id) {
     
   tagList(
   #   sidebarPanel( # Sidebar panel for inputs
-      fileInput(NS(id, "file"), p("Browse or drag-and-drop raw (RFU) DSF data", style = "font-family: 'Avenir Next'; font-size: 14px; color: black",align = "center"),
+    bsCollapse(id = "upload_help", open = "Panel 1",
+               bsCollapsePanel(p("Uploading instructions", style = "font-family: 'Avenir Next'; font-size: 14px; color: black",align = "center"),
+                               p("Upload raw RFU data by either of the following two methods:", style = "font-family: 'Avenir Next'; font-size: 12px; color: black",align = "left"),
+                               p("(i) exactly as exported from the instruments listed under 'reformat raw from instrument', below", style = "font-family: 'Avenir Next'; font-size: 12px; color: black",align = "left"),
+                               p("(ii) as formatted in the example file, (download it below): a UTF-8 csv file, with Temperature in the first column and RFU data in the columns to the right. ", style = "font-family: 'Avenir Next'; font-size: 12px; color: black",align = "left"),
+                               p(" ", style = "font-family: 'Avenir Next'; font-size: 12px; color: black",align = "center"),
+                               p("After uploading, your data will appear in its current format in a table at right. Minor adjustments can then be made, such as replacing cycle number values with Temperature.", style = "font-family: 'Avenir Next'; font-size: 12px; color: black",align = "center"),
+                               p("To use the plate-layout capabilities (e.g. setting replicates and making custom plots) in the analysis window, each data column must be named by well. Most instruments automatically export data with wells as column names, but if necessary, you can artifically write well names onto your data by checking 'Overwrite column names with wells' below", style = "font-family: 'Avenir Next'; font-size: 12px; color: black",align = "center"),
+                               downloadButton(NS(id, "download_sample_input"), "Download example file", width = '100%',style="font-size: 14px; color: #00000; background-color: #fffff; border-color: #ffff")
+               )),
+      fileInput(NS(id, "file"), label = "",
+                placeholder = "Upload raw RFU data" , 
                 multiple = FALSE,
                 accept = c(".csv", ".tsv", ".xls", ".xlsx")),
-      checkboxInput(NS(id, "name_to_well"), "Overwrite column names with wells", FALSE), # Input: Checkbox if file has header
+
+      # checkboxInput(NS(id, "name_to_well"), "Overwrite column names with wells", FALSE), # Input: Checkbox if file has header
+      # 
+      # tags$hr(),
       
-      tags$hr(),
-      p("Upload as exported from instrument", style = "font-family: 'Avenir Next'; font-size: 14px; color: black",align = "center"),
-      radioButtons(NS(id, "reformat"), "", # Input: Select type of reformatting necessary
+      # #tags$hr(),
+     # bsCollapse("uploads",id =  NS(id, "upload_help")),
+       # bsCollapse(id =  "upload_help", open = "Panel 1",
+       #             bsCollapsePanel("test")),
+
+      #           
+
+     
+      radioButtons(NS(id, "reformat"),  p("Reformat from instrument", style = "font-family: 'Avenir Next'; font-size: 14px; color: black",align = "center"), # Input: Select type of reformatting necessary
                    choices = c(None = "none",
                                Biorad = "biorad",
                                Stratagene = "stratagene",
                                quantStudio = "quantStudio",
                                qTower = "qTower" # will have to figure out how to deal with multiple reader errors
                    ), selected = "none"),
-      selectInput(NS(id,"qT_channel"), "Select channel (qTower only)",
+      selectInput(NS(id,"qT_channel"), label = "", #Select channel (qTower only)",
                   c("For qTower, select a channel" = "None",
                     "FAM" = "FAM",
                     "JOE" = "JOE",
@@ -38,7 +58,13 @@ uploadsTabUI <- function(id) {
       splitLayout(
         numericInput(NS(id, "start_T"), label="Starting Temp (ºC)", value = 25),
         numericInput(NS(id,"increment_T"), label="Increase per cycle (ºC)", value = 1)
-      )# ,
+      ) ,
+     tags$hr(),
+     checkboxInput(NS(id, "name_to_well"), "Overwrite column names with wells", FALSE), # Input: Checkbox if file has header
+
+    # tags$hr(),
+
+   
       # actionButton(NS(id,'jumpToAnalysis'), p("Analyze", style = "font-family: 'Avenir Next'; font-size: 14px; color: black",align = "center"),
       #              icon("chart-area"), width = '100%', style="font-size: 14px; color: #00000; background-color: #fffff; border-color: #ffff")
     # ),  # end sidebar panel
@@ -123,6 +149,18 @@ uploadsTabServer <- function(id) {
         shinyalert("File needs reformatting", "Select your instrument from 'Reformat raw from instrument', or format your data as shown in the downloadable template. Please ensure file is a csv, tsv, xls, or xlsx.")
       })
     })
+    
+    output$download_sample_input <- downloadHandler(
+      filename = function() {
+        paste('dsfworld_sample_raw_data_format.csv', sep='')
+      },
+      content = function(file) {
+        read_csv("dsfworld_sample_raw_data_format.csv")
+        write.csv(read_csv("dsfworld_sample_raw_data_format.csv"), file, row.names = FALSE)
+      }
+    )
+    
+    
     #
     # output$opt_format <- renderTable({
     #   df_opts_format()
