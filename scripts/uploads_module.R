@@ -6,9 +6,10 @@
 
 uploadsTabUI <- function(id) {
   
-  sidebarLayout( # Sidebar layout with input and output definitions
+ #  sidebarLayout( # Sidebar layout with input and output definitions
     
-    sidebarPanel( # Sidebar panel for inputs
+  tagList(
+  #   sidebarPanel( # Sidebar panel for inputs
       fileInput(NS(id, "file"), p("Browse or drag-and-drop raw (RFU) DSF data", style = "font-family: 'Avenir Next'; font-size: 14px; color: black",align = "center"),
                 multiple = FALSE,
                 accept = c(".csv", ".tsv", ".xls", ".xlsx")),
@@ -37,17 +38,18 @@ uploadsTabUI <- function(id) {
       splitLayout(
         numericInput(NS(id, "start_T"), label="Starting Temp (ºC)", value = 25),
         numericInput(NS(id,"increment_T"), label="Increase per cycle (ºC)", value = 1)
-      ),
-      actionButton(NS(id,'jumpToAnalysis'), p("Analyze", style = "font-family: 'Avenir Next'; font-size: 14px; color: black",align = "center"),
-                   icon("chart-area"), width = '100%', style="font-size: 14px; color: #00000; background-color: #fffff; border-color: #ffff")
-    ),  # end sidebar panel
+      )# ,
+      # actionButton(NS(id,'jumpToAnalysis'), p("Analyze", style = "font-family: 'Avenir Next'; font-size: 14px; color: black",align = "center"),
+      #              icon("chart-area"), width = '100%', style="font-size: 14px; color: #00000; background-color: #fffff; border-color: #ffff")
+    # ),  # end sidebar panel
     
     # Main panel for displaying outputs
-    mainPanel(
-      tags$style(type='text/css', "#instructions {font-size: 18px; line-height: +2;} "),
-      
-      tableOutput(NS(id,"opt_format")) %>% withSpinner(color="#525252"), style = "overflow-x: scroll;overflow-y: scroll;height:580px"
-    ) # end main panel
+   #  mainPanel(
+   #    tags$style(type='text/css', "#instructions {font-size: 18px; line-height: +2;} "),
+   #    
+   #    tableOutput(NS(id,"opt_format")) %>% withSpinner(color="#525252"), style = "overflow-x: scroll;overflow-y: scroll;height:580px"
+   # # ) # end main panel
+  #)
   )
 }
 
@@ -122,8 +124,11 @@ uploadsTabServer <- function(id) {
       })
     })
     #
-    output$opt_format <- renderTable({
-      df_opts_format()
-    })
+    # output$opt_format <- renderTable({
+    #   df_opts_format()
+    # })
+    reactive(df_opts_format()) # this the assignable output from this module
   })
+  
+
 }
